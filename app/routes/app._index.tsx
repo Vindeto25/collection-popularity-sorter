@@ -1,6 +1,6 @@
 import {format} from "date-fns";
 import type {LoaderFunctionArgs} from "react-router";
-import {useLoaderData, useNavigate} from "react-router";
+import {useLoaderData} from "react-router";
 import {TitleBar} from "@shopify/app-bridge-react";
 
 import {authenticate} from "../shopify.server";
@@ -39,7 +39,6 @@ export const loader = async ({request}: LoaderFunctionArgs) => {
 
 export default function Dashboard() {
   const data = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
 
   return (
     <main className="surface-stack">
@@ -57,9 +56,9 @@ export default function Dashboard() {
               Sort Shopify collections by quantity sold in a selected period, then apply the ranking as manual collection order.
             </s-paragraph>
             <div>
-              <button type="button" onClick={() => navigate("/app/rules/new")}>
-                Create sorting rule
-              </button>
+              <form action="/app/rules/new" method="get">
+                <button type="submit">Create sorting rule</button>
+              </form>
             </div>
           </div>
         </s-section>

@@ -1,5 +1,3 @@
-import {useNavigate} from "react-router";
-
 export function EmptyStateCard({
   heading,
   children,
@@ -11,8 +9,6 @@ export function EmptyStateCard({
   actionHref?: string;
   actionLabel?: string;
 }) {
-  const navigate = useNavigate();
-
   return (
     <s-section>
       <div className="surface-stack">
@@ -20,9 +16,9 @@ export function EmptyStateCard({
         <s-paragraph>{children}</s-paragraph>
         {actionHref && actionLabel ? (
           <div>
-            <button type="button" onClick={() => navigate(actionHref)}>
-              {actionLabel}
-            </button>
+            <form action={actionHref} method="get">
+              <button type="submit">{actionLabel}</button>
+            </form>
           </div>
         ) : null}
       </div>
