@@ -1,4 +1,4 @@
-import type {AnchorHTMLAttributes} from "react";
+import type {AnchorHTMLAttributes, MouseEvent} from "react";
 import {useLocation} from "react-router";
 
 import {
@@ -26,12 +26,30 @@ export function AppLink({to, ...props}: AppLinkProps) {
 export function AppButtonLink({to, className, ...props}: AppButtonLinkProps) {
   const location = useLocation();
   const embeddedSearch = getReusableEmbeddedSearch(location.search);
+  const href = withEmbeddedQueryParams(to, embeddedSearch);
+
+  function forceDocumentNavigation(event: MouseEvent<HTMLAnchorElement>) {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    window.location.assign(href);
+  }
 
   return (
     <a
       {...props}
       className={classNames("button-link", className)}
-      href={withEmbeddedQueryParams(to, embeddedSearch)}
+      href={href}
+      onClick={forceDocumentNavigation}
     />
   );
 }
