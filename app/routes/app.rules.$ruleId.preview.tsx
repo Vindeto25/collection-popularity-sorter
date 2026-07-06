@@ -6,6 +6,7 @@ import {TitleBar} from "@shopify/app-bridge-react";
 import {ProductRankingTable} from "../components/ProductRankingTable";
 import {authenticate} from "../shopify.server";
 import {requireRule} from "../modules/rules/rules.service.server";
+import {withEmbeddedQueryParams} from "../modules/shopify/embeddedNavigation";
 import {
   buildSortPreview,
   runCollectionSort,
@@ -24,14 +25,21 @@ export const loader = async ({request, params}: LoaderFunctionArgs) => {
 export const action = async ({request, params}: ActionFunctionArgs) => {
   const {admin, session} = await authenticate.admin(request);
   const rule = await requireRule(session.shop, params.ruleId ?? "");
+  const currentSearch = new URL(request.url).search;
 
   try {
     await runCollectionSort({admin, shopDomain: session.shop, rule});
-    return redirect("/app/runs?success=Sort applied");
+    return redirect(
+      withEmbeddedQueryParams("/app/runs", currentSearch, {
+        success: "Sort applied",
+      }),
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Sort could not be applied";
     return redirect(
-      `/app/rules/${rule.id}/preview?error=${encodeURIComponent(message)}`,
+      withEmbeddedQueryParams(`/app/rules/${rule.id}/preview`, currentSearch, {
+        error: message,
+      }),
     );
   }
 };

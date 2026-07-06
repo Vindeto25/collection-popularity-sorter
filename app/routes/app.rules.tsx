@@ -1,13 +1,15 @@
 import {format} from "date-fns";
 import type {ActionFunctionArgs, LoaderFunctionArgs} from "react-router";
-import {Form, Link, redirect, useLoaderData} from "react-router";
+import {Form, redirect, useLoaderData} from "react-router";
 import {TitleBar} from "@shopify/app-bridge-react";
 
+import {AppButtonLink, AppLink} from "../components/AppNavigation";
 import {MetricBadge} from "../components/MetricBadge";
 import {RunStatusBadge} from "../components/RunStatusBadge";
 import {authenticate} from "../shopify.server";
 import {EmptyStateCard} from "../components/EmptyStateCard";
 import {listRules} from "../modules/rules/rules.repository.server";
+import {withEmbeddedQueryParams} from "../modules/shopify/embeddedNavigation";
 import {
   disableRule,
   enableRule,
@@ -34,9 +36,14 @@ export const action = async ({request}: ActionFunctionArgs) => {
   const formData = await request.formData();
   const ruleId = String(formData.get("ruleId") ?? "");
   const intent = String(formData.get("intent") ?? "");
+  const currentSearch = new URL(request.url).search;
 
   if (!ruleId) {
-    return redirect("/app/rules?error=Missing rule");
+    return redirect(
+      withEmbeddedQueryParams("/app/rules", currentSearch, {
+        error: "Missing rule",
+      }),
+    );
   }
 
   try {
@@ -44,29 +51,47 @@ export const action = async ({request}: ActionFunctionArgs) => {
 
     if (intent === "runNow") {
       await runCollectionSort({admin, shopDomain: session.shop, rule});
-      return redirect("/app/runs?success=Sorting run completed");
+      return redirect(
+        withEmbeddedQueryParams("/app/runs", currentSearch, {
+          success: "Sorting run completed",
+        }),
+      );
     }
 
     if (intent === "disable") {
       await disableRule(session.shop, ruleId);
-      return redirect("/app/rules?success=Rule disabled");
+      return redirect(
+        withEmbeddedQueryParams("/app/rules", currentSearch, {
+          success: "Rule disabled",
+        }),
+      );
     }
 
     if (intent === "enable") {
       await enableRule(session.shop, rule);
-      return redirect("/app/rules?success=Rule enabled");
+      return redirect(
+        withEmbeddedQueryParams("/app/rules", currentSearch, {
+          success: "Rule enabled",
+        }),
+      );
     }
 
     if (intent === "delete") {
       await removeRule(session.shop, ruleId);
-      return redirect("/app/rules?success=Rule deleted");
+      return redirect(
+        withEmbeddedQueryParams("/app/rules", currentSearch, {
+          success: "Rule deleted",
+        }),
+      );
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : "Action failed";
-    return redirect(`/app/rules?error=${encodeURIComponent(message)}`);
+    return redirect(
+      withEmbeddedQueryParams("/app/rules", currentSearch, {error: message}),
+    );
   }
 
-  return redirect("/app/rules");
+  return redirect(withEmbeddedQueryParams("/app/rules", currentSearch));
 };
 
 export default function RulesPage() {
@@ -78,9 +103,7 @@ export default function RulesPage() {
       <div className="surface-stack">
         <s-section heading="Sort rules">
           <div className="button-row">
-            <form action="/app/rules/new" method="get">
-              <button type="submit">Create sorting rule</button>
-            </form>
+            <AppButtonLink to="/app/rules/new">Create sorting rule</AppButtonLink>
           </div>
         </s-section>
 
@@ -129,8 +152,10 @@ export default function RulesPage() {
                     </td>
                     <td>
                       <div className="table-actions">
-                        <Link to={`/app/rules/${rule.id}`}>Edit</Link>
-                        <Link to={`/app/rules/${rule.id}/preview`}>Preview</Link>
+                        <AppLink to={`/app/rules/${rule.id}`}>Edit</AppLink>
+                        <AppLink to={`/app/rules/${rule.id}/preview`}>
+                          Preview
+                        </AppLink>
                         <Form
                           method="post"
                           onSubmit={(event) => {

@@ -6,6 +6,7 @@ import {RuleForm} from "../components/RuleForm";
 import {authenticate} from "../shopify.server";
 import {listCollections} from "../modules/shopify/collections.server";
 import {createRuleFromForm} from "../modules/rules/rules.service.server";
+import {withEmbeddedQueryParams} from "../modules/shopify/embeddedNavigation";
 import {runCollectionSort} from "../modules/sorting/runCollectionSort.server";
 
 export const loader = async ({request}: LoaderFunctionArgs) => {
@@ -19,23 +20,36 @@ export const action = async ({request}: ActionFunctionArgs) => {
   const {admin, session} = await authenticate.admin(request);
   const formData = await request.formData();
   const intent = String(formData.get("intent") ?? "save");
+  const currentSearch = new URL(request.url).search;
 
   try {
     const rule = await createRuleFromForm(session.shop, formData);
 
     if (intent === "preview") {
-      return redirect(`/app/rules/${rule.id}/preview`);
+      return redirect(
+        withEmbeddedQueryParams(`/app/rules/${rule.id}/preview`, currentSearch),
+      );
     }
 
     if (intent === "saveAndRun") {
       await runCollectionSort({admin, shopDomain: session.shop, rule});
-      return redirect("/app/runs?success=Rule saved and sorting run completed");
+      return redirect(
+        withEmbeddedQueryParams("/app/runs", currentSearch, {
+          success: "Rule saved and sorting run completed",
+        }),
+      );
     }
 
-    return redirect("/app/rules?success=Rule saved");
+    return redirect(
+      withEmbeddedQueryParams("/app/rules", currentSearch, {
+        success: "Rule saved",
+      }),
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Rule could not be saved";
-    return redirect(`/app/rules/new?error=${encodeURIComponent(message)}`);
+    return redirect(
+      withEmbeddedQueryParams("/app/rules/new", currentSearch, {error: message}),
+    );
   }
 };
 

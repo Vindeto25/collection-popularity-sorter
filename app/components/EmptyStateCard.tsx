@@ -1,3 +1,5 @@
+import {AppButtonLink} from "./AppNavigation";
+
 export function EmptyStateCard({
   heading,
   children,
@@ -16,9 +18,7 @@ export function EmptyStateCard({
         <s-paragraph>{children}</s-paragraph>
         {actionHref && actionLabel ? (
           <div>
-            <form action={actionHref} method="get">
-              <button type="submit">{actionLabel}</button>
-            </form>
+            <AppButtonLink to={actionHref}>{actionLabel}</AppButtonLink>
           </div>
         ) : null}
       </div>

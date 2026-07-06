@@ -10,6 +10,7 @@ import {
 } from "../modules/rules/rules.repository.server";
 import {getLatestRunByStatus} from "../modules/runs/runs.repository.server";
 import {checkGrantedScopes} from "../modules/shopify/scopes.server";
+import {AppButtonLink} from "../components/AppNavigation";
 
 function formatDate(date: Date | string | null | undefined) {
   return date ? format(new Date(date), "MMM d, yyyy h:mm a") : "None yet";
@@ -56,9 +57,7 @@ export default function Dashboard() {
               Sort Shopify collections by quantity sold in a selected period, then apply the ranking as manual collection order.
             </s-paragraph>
             <div>
-              <form action="/app/rules/new" method="get">
-                <button type="submit">Create sorting rule</button>
-              </form>
+              <AppButtonLink to="/app/rules/new">Create sorting rule</AppButtonLink>
             </div>
           </div>
         </s-section>

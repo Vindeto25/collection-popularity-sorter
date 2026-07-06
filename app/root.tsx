@@ -39,7 +39,9 @@ export default function App() {
 export function ErrorBoundary() {
   const error = useRouteError();
   const message = isRouteErrorResponse(error)
-    ? `${error.status} ${error.statusText}`
+    ? error.status === 200
+      ? "Shopify redirected the embedded app before this page could load. Reopen the app from Shopify admin."
+      : `${error.status} ${error.statusText}`
     : error instanceof Error
       ? error.message
       : "Something went wrong.";

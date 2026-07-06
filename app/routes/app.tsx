@@ -3,6 +3,7 @@ import {
   Link,
   Outlet,
   useLoaderData,
+  useLocation,
   useRouteError,
   useSearchParams,
 } from "react-router";
@@ -13,6 +14,7 @@ import {useEffect} from "react";
 
 import {authenticate} from "../shopify.server";
 import {upsertShop} from "../modules/shopify/adminClient.server";
+import {withEmbeddedQueryParams} from "../modules/shopify/embeddedNavigation";
 
 export const loader = async ({request}: LoaderFunctionArgs) => {
   const {session} = await authenticate.admin(request);
@@ -44,16 +46,23 @@ function ToastFromSearchParams() {
 
 export default function AppLayout() {
   const {apiKey} = useLoaderData<typeof loader>();
+  const location = useLocation();
 
   return (
     <AppProvider embedded apiKey={apiKey}>
       <NavMenu>
-        <Link to="/app" rel="home">
+        <Link to={withEmbeddedQueryParams("/app", location.search)} rel="home">
           Dashboard
         </Link>
-        <Link to="/app/rules">Sort rules</Link>
-        <Link to="/app/runs">Run history</Link>
-        <Link to="/app/settings">Settings</Link>
+        <Link to={withEmbeddedQueryParams("/app/rules", location.search)}>
+          Sort rules
+        </Link>
+        <Link to={withEmbeddedQueryParams("/app/runs", location.search)}>
+          Run history
+        </Link>
+        <Link to={withEmbeddedQueryParams("/app/settings", location.search)}>
+          Settings
+        </Link>
       </NavMenu>
       <ToastFromSearchParams />
       <Outlet />
