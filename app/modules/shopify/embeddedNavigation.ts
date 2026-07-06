@@ -1,4 +1,6 @@
 const FLASH_PARAMS = new Set(["success", "error"]);
+const EMBEDDED_SEARCH_STORAGE_KEY =
+  "collection-popularity-sorter:embedded-search";
 
 function splitTarget(target: string) {
   const hashIndex = target.indexOf("#");
@@ -37,3 +39,29 @@ export function withEmbeddedQueryParams(
   return `${pathname}${nextSearch ? `?${nextSearch}` : ""}${hash}`;
 }
 
+export function getReusableEmbeddedSearch(currentSearch: string) {
+  if (typeof window === "undefined") {
+    return currentSearch;
+  }
+
+  const params = new URLSearchParams(currentSearch);
+  const hasEmbeddedParams =
+    params.has("shop") || params.has("host") || params.has("id_token");
+
+  try {
+    if (hasEmbeddedParams) {
+      window.sessionStorage.setItem(
+        EMBEDDED_SEARCH_STORAGE_KEY,
+        currentSearch,
+      );
+      return currentSearch;
+    }
+
+    return (
+      window.sessionStorage.getItem(EMBEDDED_SEARCH_STORAGE_KEY) ??
+      currentSearch
+    );
+  } catch {
+    return currentSearch;
+  }
+}

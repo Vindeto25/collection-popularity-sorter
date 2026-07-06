@@ -1,32 +1,37 @@
-import type {ComponentProps} from "react";
-import {Link, useLocation, useNavigate} from "react-router";
+import type {AnchorHTMLAttributes} from "react";
+import {useLocation} from "react-router";
 
-import {withEmbeddedQueryParams} from "../modules/shopify/embeddedNavigation";
+import {
+  getReusableEmbeddedSearch,
+  withEmbeddedQueryParams,
+} from "../modules/shopify/embeddedNavigation";
 
-type AppLinkProps = Omit<ComponentProps<typeof Link>, "to"> & {
+type AppLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
   to: string;
 };
 
-type AppButtonLinkProps = Omit<ComponentProps<"button">, "onClick" | "type"> & {
-  to: string;
-};
+type AppButtonLinkProps = AppLinkProps;
+
+function classNames(...values: Array<string | undefined>) {
+  return values.filter(Boolean).join(" ");
+}
 
 export function AppLink({to, ...props}: AppLinkProps) {
   const location = useLocation();
+  const embeddedSearch = getReusableEmbeddedSearch(location.search);
 
-  return <Link {...props} to={withEmbeddedQueryParams(to, location.search)} />;
+  return <a {...props} href={withEmbeddedQueryParams(to, embeddedSearch)} />;
 }
 
-export function AppButtonLink({to, ...props}: AppButtonLinkProps) {
+export function AppButtonLink({to, className, ...props}: AppButtonLinkProps) {
   const location = useLocation();
-  const navigate = useNavigate();
+  const embeddedSearch = getReusableEmbeddedSearch(location.search);
 
   return (
-    <button
+    <a
       {...props}
-      type="button"
-      onClick={() => navigate(withEmbeddedQueryParams(to, location.search))}
+      className={classNames("button-link", className)}
+      href={withEmbeddedQueryParams(to, embeddedSearch)}
     />
   );
 }
-

@@ -14,7 +14,10 @@ import {useEffect} from "react";
 
 import {authenticate} from "../shopify.server";
 import {upsertShop} from "../modules/shopify/adminClient.server";
-import {withEmbeddedQueryParams} from "../modules/shopify/embeddedNavigation";
+import {
+  getReusableEmbeddedSearch,
+  withEmbeddedQueryParams,
+} from "../modules/shopify/embeddedNavigation";
 
 export const loader = async ({request}: LoaderFunctionArgs) => {
   const {session} = await authenticate.admin(request);
@@ -47,20 +50,21 @@ function ToastFromSearchParams() {
 export default function AppLayout() {
   const {apiKey} = useLoaderData<typeof loader>();
   const location = useLocation();
+  const embeddedSearch = getReusableEmbeddedSearch(location.search);
 
   return (
     <AppProvider embedded apiKey={apiKey}>
       <NavMenu>
-        <Link to={withEmbeddedQueryParams("/app", location.search)} rel="home">
+        <Link to={withEmbeddedQueryParams("/app", embeddedSearch)} rel="home">
           Dashboard
         </Link>
-        <Link to={withEmbeddedQueryParams("/app/rules", location.search)}>
+        <Link to={withEmbeddedQueryParams("/app/rules", embeddedSearch)}>
           Sort rules
         </Link>
-        <Link to={withEmbeddedQueryParams("/app/runs", location.search)}>
+        <Link to={withEmbeddedQueryParams("/app/runs", embeddedSearch)}>
           Run history
         </Link>
-        <Link to={withEmbeddedQueryParams("/app/settings", location.search)}>
+        <Link to={withEmbeddedQueryParams("/app/settings", embeddedSearch)}>
           Settings
         </Link>
       </NavMenu>

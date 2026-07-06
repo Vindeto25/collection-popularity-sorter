@@ -78,6 +78,34 @@ main.surface-stack {
   align-items: center;
 }
 
+.button-link {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 1px solid #8a8a8a;
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: #ffffff;
+  color: #202223;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button-link:hover {
+  background: #f7f7f7;
+}
+
+.button-link:focus-visible {
+  outline: 2px solid #005bd3;
+  outline-offset: 2px;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
