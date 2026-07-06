@@ -46,7 +46,7 @@ export type RankedProduct = CollectionProduct & {
 
 export type MoveInput = {
   id: string;
-  newPosition: number;
+  newPosition: string;
 };
 
 export type SortPreview = {

@@ -20,8 +20,8 @@ describe("calculateMoves", () => {
 
     expect(applyMovesForTest(current, moves)).toEqual(target);
     expect(moves).toEqual([
-      {id: "p3", newPosition: 0},
-      {id: "p4", newPosition: 2},
+      {id: "p3", newPosition: "0"},
+      {id: "p4", newPosition: "2"},
     ]);
   });
 

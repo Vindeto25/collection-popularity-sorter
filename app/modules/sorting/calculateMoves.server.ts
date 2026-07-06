@@ -48,7 +48,7 @@ export function calculateMoves(
 
     working.splice(currentIndex, 1);
     working.splice(desiredIndex, 0, desiredId);
-    moves.push({id: desiredId, newPosition: desiredIndex});
+    moves.push({id: desiredId, newPosition: String(desiredIndex)});
   }
 
   return moves;
@@ -67,7 +67,10 @@ export function applyMovesForTest(
     }
 
     const [productId] = working.splice(fromIndex, 1);
-    const toIndex = Math.min(Math.max(move.newPosition, 0), working.length);
+    const numericPosition = Number(move.newPosition);
+    const toIndex = Number.isFinite(numericPosition)
+      ? Math.min(Math.max(numericPosition, 0), working.length)
+      : working.length;
     working.splice(toIndex, 0, productId);
   }
 
