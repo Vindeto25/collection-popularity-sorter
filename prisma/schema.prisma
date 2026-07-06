@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+}
+
+model Shop {
+  id         String   @id @default(cuid())
+  shopDomain String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model SortRule {
+  id                String            @id @default(cuid())
+  shopDomain        String
+  collectionId      String
+  collectionHandle  String?
+  collectionTitle   String
+  periodType        PeriodType
+  customStartDate   DateTime?
+  customEndDate     DateTime?
+  metric            SortMetric        @default(QUANTITY_SOLD)
+  schedule          SortSchedule      @default(MANUAL)
+  enabled           Boolean           @default(true)
+  zeroSalesBehavior ZeroSalesBehavior @default(KEEP_RELATIVE_ORDER_AFTER_SOLD)
+  lastRunAt         DateTime?
+  nextRunAt         DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  runs              SortRun[]
+
+  @@index([shopDomain])
+  @@index([shopDomain, enabled, nextRunAt])
+  @@unique([shopDomain, collectionId])
+}
+
+model SortRun {
+  id               String        @id @default(cuid())
+  shopDomain       String
+  ruleId           String?
+  rule             SortRule?     @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  collectionId     String
+  periodStart      DateTime
+  periodEnd        DateTime
+  status           SortRunStatus @default(PENDING)
+  productsAnalyzed Int           @default(0)
+  productsMoved    Int           @default(0)
+  errorMessage     String?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime      @default(now())
+
+  @@index([shopDomain, createdAt])
+  @@index([ruleId])
+}
+
+model ProductSalesDaily {
+  id           String   @id @default(cuid())
+  shopDomain   String
+  date         DateTime
+  productId    String
+  variantId    String   @default("")
+  quantitySold Int      @default(0)
+  grossSales   Decimal  @default(0) @db.Decimal(12, 2)
+  orderCount   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([shopDomain, date, productId, variantId])
+  @@index([shopDomain, productId, date])
+}
+
+model SyncedOrder {
+  id               String    @id @default(cuid())
+  shopDomain       String
+  orderId          String
+  processedAt      DateTime?
+  cancelledAt      DateTime?
+  financialStatus  String?
+  rawLineItemsJson Json
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([shopDomain, orderId])
+  @@index([shopDomain, processedAt])
+}
+
+enum PeriodType {
+  SEVEN_DAYS
+  THIRTY_DAYS
+  NINETY_DAYS
+  ONE_YEAR
+  CUSTOM
+}
+
+enum SortMetric {
+  QUANTITY_SOLD
+}
+
+enum SortSchedule {
+  MANUAL
+  DAILY
+  WEEKLY
+}
+
+enum ZeroSalesBehavior {
+  KEEP_RELATIVE_ORDER_AFTER_SOLD
+}
+
+enum SortRunStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+}

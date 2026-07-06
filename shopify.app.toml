@@ -1,0 +1,46 @@
+name = "Collection Popularity Sorter"
+client_id = "REPLACE_WITH_SHOPIFY_API_KEY"
+application_url = "https://example.com"
+embedded = true
+
+[access_scopes]
+scopes = "read_products,write_products,read_orders,read_all_orders"
+
+[auth]
+redirect_urls = [
+  "https://example.com/auth/callback",
+  "https://example.com/auth/shopify/callback",
+  "https://example.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2026-07"
+
+[[webhooks.subscriptions]]
+topics = ["orders/paid"]
+uri = "/webhooks/orders/paid"
+
+[[webhooks.subscriptions]]
+topics = ["orders/updated"]
+uri = "/webhooks/orders/updated"
+
+[[webhooks.subscriptions]]
+topics = ["orders/cancelled"]
+uri = "/webhooks/orders/cancelled"
+
+[[webhooks.subscriptions]]
+topics = ["refunds/create"]
+uri = "/webhooks/orders/refunded"
+
+[[webhooks.subscriptions]]
+topics = ["app/uninstalled"]
+uri = "/webhooks/app/uninstalled"
+
+[webhooks.privacy_compliance]
+customer_deletion_url = "https://example.com/webhooks/customers/redact"
+customer_data_request_url = "https://example.com/webhooks/customers/data_request"
+shop_deletion_url = "https://example.com/webhooks/shop/redact"
+
+[build]
+automatically_update_urls_on_dev = true
+include_config_on_deploy = true
