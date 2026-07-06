@@ -11,9 +11,20 @@ import {runCollectionSort} from "../modules/sorting/runCollectionSort.server";
 
 export const loader = async ({request}: LoaderFunctionArgs) => {
   const {admin} = await authenticate.admin(request);
-  const collections = await listCollections(admin);
 
-  return {collections};
+  try {
+    const collections = await listCollections(admin);
+
+    return {collections, loadError: null};
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Collections could not be loaded.";
+    console.error("Failed to load collections for rule form", error);
+
+    return {collections: [], loadError: message};
+  }
 };
 
 export const action = async ({request}: ActionFunctionArgs) => {
@@ -54,12 +65,17 @@ export const action = async ({request}: ActionFunctionArgs) => {
 };
 
 export default function NewRulePage() {
-  const {collections} = useLoaderData<typeof loader>();
+  const {collections, loadError} = useLoaderData<typeof loader>();
 
   return (
     <main className="surface-stack">
       <TitleBar title="Create sorting rule" />
       <div className="surface-stack">
+        {loadError ? (
+          <s-banner tone="critical">
+            Collections could not be loaded: {loadError}
+          </s-banner>
+        ) : null}
         <s-section heading="Create sorting rule">
           <s-paragraph>
             Choose a collection, sales period, and schedule.

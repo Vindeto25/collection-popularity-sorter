@@ -28,6 +28,7 @@ export function RuleForm({
   const [periodType, setPeriodType] = useState<PeriodType>(
     (rule?.periodType as PeriodType | undefined) ?? "THIRTY_DAYS",
   );
+  const cannotSubmit = collections.length === 0;
 
   const selectedCollection = useMemo(
     () => collections.find((collection) => collection.id === collectionId),
@@ -151,10 +152,15 @@ export function RuleForm({
         <button type="submit" name="intent" value="preview">
           Preview ranking
         </button>
-        <button type="submit" name="intent" value="save">
+        <button type="submit" name="intent" value="save" disabled={cannotSubmit}>
           Save rule
         </button>
-        <button type="submit" name="intent" value="saveAndRun">
+        <button
+          type="submit"
+          name="intent"
+          value="saveAndRun"
+          disabled={cannotSubmit}
+        >
           Save and run now
         </button>
       </div>
