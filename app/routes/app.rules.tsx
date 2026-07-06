@@ -1,6 +1,6 @@
 import {format} from "date-fns";
 import type {ActionFunctionArgs, LoaderFunctionArgs} from "react-router";
-import {Form, Link, redirect, useLoaderData} from "react-router";
+import {Form, Link, redirect, useLoaderData, useNavigate} from "react-router";
 import {TitleBar} from "@shopify/app-bridge-react";
 
 import {MetricBadge} from "../components/MetricBadge";
@@ -71,6 +71,7 @@ export const action = async ({request}: ActionFunctionArgs) => {
 
 export default function RulesPage() {
   const {rules} = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
 
   return (
     <main className="surface-stack">
@@ -78,7 +79,9 @@ export default function RulesPage() {
       <div className="surface-stack">
         <s-section heading="Sort rules">
           <div className="button-row">
-            <Link to="/app/rules/new">Create sorting rule</Link>
+            <button type="button" onClick={() => navigate("/app/rules/new")}>
+              Create sorting rule
+            </button>
           </div>
         </s-section>
 
