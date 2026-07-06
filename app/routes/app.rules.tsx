@@ -1,6 +1,6 @@
 import {format} from "date-fns";
 import type {ActionFunctionArgs, LoaderFunctionArgs} from "react-router";
-import {Form, redirect, useLoaderData} from "react-router";
+import {Form, Outlet, redirect, useLoaderData, useLocation} from "react-router";
 import {TitleBar} from "@shopify/app-bridge-react";
 
 import {AppButtonLink, AppLink} from "../components/AppNavigation";
@@ -96,6 +96,12 @@ export const action = async ({request}: ActionFunctionArgs) => {
 
 export default function RulesPage() {
   const {rules} = useLoaderData<typeof loader>();
+  const location = useLocation();
+  const isRulesIndex = location.pathname.replace(/\/$/, "") === "/app/rules";
+
+  if (!isRulesIndex) {
+    return <Outlet />;
+  }
 
   return (
     <main className="surface-stack">

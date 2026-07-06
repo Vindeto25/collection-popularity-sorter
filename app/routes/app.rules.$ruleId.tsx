@@ -1,5 +1,5 @@
 import type {ActionFunctionArgs, LoaderFunctionArgs} from "react-router";
-import {redirect, useLoaderData} from "react-router";
+import {Outlet, redirect, useLoaderData, useLocation} from "react-router";
 import {TitleBar} from "@shopify/app-bridge-react";
 
 import {RuleForm} from "../components/RuleForm";
@@ -65,6 +65,12 @@ export const action = async ({request, params}: ActionFunctionArgs) => {
 
 export default function EditRulePage() {
   const {rule, collections} = useLoaderData<typeof loader>();
+  const location = useLocation();
+  const isPreviewRoute = location.pathname.replace(/\/$/, "").endsWith("/preview");
+
+  if (isPreviewRoute) {
+    return <Outlet />;
+  }
 
   return (
     <main className="surface-stack">
