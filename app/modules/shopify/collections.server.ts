@@ -164,8 +164,8 @@ export async function updateCollectionSortOrderToManual(
   }>(
     admin,
     `#graphql
-      mutation UpdateCollectionSortOrder($collection: CollectionUpdateInput!) {
-        collectionUpdate(collection: $collection) {
+      mutation UpdateCollectionSortOrder($input: CollectionInput!) {
+        collectionUpdate(input: $input) {
           collection {
             id
             sortOrder
@@ -177,7 +177,7 @@ export async function updateCollectionSortOrderToManual(
         }
       }
     `,
-    {collection: {id: collectionId, sortOrder: "MANUAL"}},
+    {input: {id: collectionId, sortOrder: "MANUAL"}},
   );
 
   const userError = userErrorsToMessage(data.collectionUpdate.userErrors);
